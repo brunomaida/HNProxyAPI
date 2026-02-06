@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		attention.SwashBuckle.md = attention.SwashBuckle.md
 		LICENSE.txt = LICENSE.txt
 		Dockerfile. = Dockerfile.
+		readme-configuration.md = readme-configuration.md
 		readme.md = readme.md
 		roadmap.md = roadmap.md
 	EndProjectSection

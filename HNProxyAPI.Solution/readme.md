@@ -67,8 +67,9 @@ Run the API in an isolated container to simulate a production environment.
 1. Open `HNProxyAPI.sln`.
 2. In the Solution Explorer, right-click the **HNProxyAPI** project.
 3. Select **"Set as Startup Project"**.
-4. Press **F5** (Debug) or **Ctrl+F5** (Run without Debugging).
-5. The browser will launch automatically pointing to the Swagger UI 
+4. Choose **http/https**
+5. Press **F5** (Debug) or **Ctrl+F5** (Run without Debugging).
+6. The browser will launch automatically pointing to the Swagger UI 
 
 --- 
 
