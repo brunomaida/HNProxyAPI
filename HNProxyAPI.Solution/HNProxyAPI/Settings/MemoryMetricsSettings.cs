@@ -2,6 +2,7 @@
 
 namespace HNAPI.Settings
 {
+    [Obsolete]
     public class MemoryMetricsSettings
     {
         private const string METRICS_MEMORY_NAME = "HackerNewsQueryAPI.Memory";
