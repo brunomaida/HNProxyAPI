@@ -1,20 +1,28 @@
-# STAGE 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /app
+# STAGE 1: PREPARE
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-# Copy csproj and restore dependencies
-# Using wildcards to handle different project names
-COPY *.csproj ./
-RUN dotnet restore
+# 1. Copy csproj 
+COPY ["HNProxyAPI/HNProxyAPI.csproj", "HNProxyAPI/"]
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+# 2. Restore dependencies
+RUN dotnet restore "HNProxyAPI/HNProxyAPI.csproj"
+
+# 3. Copy all other files
+COPY . .
+
+# 4. Publish (Build is implicit)
+WORKDIR "/src/HNProxyAPI"
+RUN dotnet publish -c Release -o /app/publish
 
 # STAGE 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build-env /app/out .
+
+# CORREÇÃO CRÍTICA AQUI:
+# --from=build: 
+# /app/publish: 
+COPY --from=build /app/publish .
 
 # Expose port 8080 (default for .NET 8+)
 EXPOSE 8080

@@ -44,7 +44,7 @@ You can execute the application using the .NET CLI, Docker, or Visual Studio. Be
     > **Tip:** Use `dotnet watch run` to enable Hot Reload during development.
 
 4.  **Verify:** The console will display the listening ports. Open your browser to:
-    **Swagger UI:** `https://localhost:7100/swagger` (Check console for the exact port)
+    **Swagger UI:** `https://localhost:[port]/swagger` (Check console for the exact port)
 
 ### Option B: Using Docker (Production Simulation)
 Run the API in an isolated container to simulate a production environment.
@@ -55,18 +55,18 @@ Run the API in an isolated container to simulate a production environment.
    ```bash
    docker build -t hnproxyapi .
     ```
-3.  Run the container (mapping port 8080):
-    ```bash
-    docker run --rm -d -p 8080:8080 --name hnproxyapi-instance hnproxyapi
-    ```
-4.  **Verify:** Access the API via `http://localhost:8080/swagger`.
+3. Run the container (mapping port 8080):
+   ```bash
+   docker run --rm -d -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development --name hnproxyapi-instance hnproxyapi
+   ```
+4. **Verify:** Access the API via `http://localhost:8080/swagger`.
 
 ### Option C: Using Visual Studio 2022
-1.  Open `HNProxyAPI.sln`.
-2.  In the Solution Explorer, right-click the **HNProxyAPI** project.
-3.  Select **"Set as Startup Project"**.
-4.  Press **F5** (Debug) or **Ctrl+F5** (Run without Debugging).
-5.  The browser will launch automatically pointing to the Swagger UI 
+1. Open `HNProxyAPI.sln`.
+2. In the Solution Explorer, right-click the **HNProxyAPI** project.
+3. Select **"Set as Startup Project"**.
+4. Press **F5** (Debug) or **Ctrl+F5** (Run without Debugging).
+5. The browser will launch automatically pointing to the Swagger UI 
 
 --- 
 
@@ -98,6 +98,11 @@ Data structures (e.g., `Story`) are defined as `readonly record struct` with cus
 * **Stack Allocation:** Small structs tend to be allocated on the Stack (or inlined in Arrays), avoiding Managed Heap fragmentation.
 * **Immutability:** Ensures natural **Thread Safety** in high-concurrency environments.
 * **Performance:** Reduces pressure on the Garbage Collector (Gen0/Gen1), which is vital for maintaining stable API latency (avoiding GC Pauses).
+
+### 7. Use of `Channel File Logger` for the output of log message into a local file
+Fastest option for this initial release - \Logs\hnproxyapi_logs_yyyyMMdd_hh.txt
+* **Producer/Consumer:** Combined with a bounded channel that drops the oldest in case of overflow.
+* **Performance:** Writes asynchronously into the local file.
 
 ---
 
