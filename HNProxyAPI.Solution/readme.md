@@ -47,16 +47,17 @@ You can execute the application using the .NET CLI, Docker, or Visual Studio. Be
     **Swagger UI:** `https://localhost:7100/swagger` (Check console for the exact port)
 
 ### Option B: Using Docker (Production Simulation)
-Run the API in an isolated Linux container to simulate a production environment.
+Run the API in an isolated container to simulate a production environment.
 
-1.  Navigate to the **solution root** folder.
-2.  Build the Docker image:
-    ```bash
-    docker build -t hnapi-proxy -f HNProxyAPI/Dockerfile .
+1. 1. **Prerequisite:** Ensure Docker Desktop (or Engine) is running.
+2. Navigate to the **solution root** folder (where the `.sln` and `Dockerfile` are located).
+3. Build the Docker image:
+   ```bash
+   docker build -t hnproxyapi .
     ```
 3.  Run the container (mapping port 8080):
     ```bash
-    docker run -d -p 8080:8080 --name hnapi-instance hnapi-proxy
+    docker run --rm -d -p 8080:8080 --name hnproxyapi-instance hnproxyapi
     ```
 4.  **Verify:** Access the API via `http://localhost:8080/swagger`.
 
