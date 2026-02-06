@@ -24,7 +24,7 @@ namespace HNProxyAPI.Tests.Integration
             // Step A: Return list of IDs
             _factory.MockHttpHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString().Contains("beststories.json")),
+                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri != null && r.RequestUri.ToString().Contains("beststories.json")),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage
                 {
@@ -35,7 +35,7 @@ namespace HNProxyAPI.Tests.Integration
             // Step B: Return details for ID 100
             _factory.MockHttpHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString().Contains("item/100.json")),
+                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri != null && r.RequestUri.ToString().Contains("item/100.json")),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage
                 {
@@ -46,7 +46,7 @@ namespace HNProxyAPI.Tests.Integration
             // Step C: Return details for ID 200
             _factory.MockHttpHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString().Contains("item/200.json")),
+                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri != null && r.RequestUri.ToString().Contains("item/200.json")),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage
                 {
@@ -56,7 +56,7 @@ namespace HNProxyAPI.Tests.Integration
 
             var client = _factory.CreateClient();
 
-            HttpResponseMessage healthResponse = null;
+            HttpResponseMessage? healthResponse = null;
             for (int i = 0; i < 10; i++) 
             {
                 healthResponse = await client.GetAsync("/health");
@@ -64,7 +64,7 @@ namespace HNProxyAPI.Tests.Integration
                 await Task.Delay(1000);
             }
 
-            healthResponse.StatusCode.Should().Be(HttpStatusCode.OK, "StoryCache should have been populated.");
+            healthResponse?.StatusCode.Should().Be(HttpStatusCode.OK, "StoryCache should have been populated.");
 
             // Act
             var response = await client.GetAsync("/api/beststories?n=2"); 
@@ -72,7 +72,7 @@ namespace HNProxyAPI.Tests.Integration
             // #ASSERT
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var stories = await response.Content.ReadFromJsonAsync<List<Story>>();
+            var stories = await response.Content.ReadFromJsonAsync<List<Story>>(cancellationToken: TestContext.Current.CancellationToken);
             stories.Should().NotBeNull();
             stories.Should().HaveCountGreaterThanOrEqualTo(2);
 

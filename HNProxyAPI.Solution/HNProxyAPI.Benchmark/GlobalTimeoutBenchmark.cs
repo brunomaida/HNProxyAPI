@@ -1,18 +1,18 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using HNProxyAPI.Middlewares;
 using HNProxyAPI.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using BenchmarkDotNet.TestAdapter;
 using Moq;
 
 namespace HNProxyAPI.Benchmark
 {
+    [ShortRunJob]
     [MemoryDiagnoser]
     public class GlobalTimeoutBenchmark
     {
-        private DefaultHttpContext _context;
-        private RequestDelegate _next;
+        private DefaultHttpContext? _context;
+        private RequestDelegate? _next;
         private GlobalTimeout _middleware;
         private Mock<IOptionsMonitor<InboundAPISettings>> _settings;
 

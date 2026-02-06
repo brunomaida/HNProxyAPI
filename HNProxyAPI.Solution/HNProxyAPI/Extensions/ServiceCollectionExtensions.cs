@@ -4,7 +4,6 @@ using HNProxyAPI.Middlewares;
 using HNProxyAPI.Services;
 using HNProxyAPI.Settings;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
 

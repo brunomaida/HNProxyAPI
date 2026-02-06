@@ -8,18 +8,18 @@ namespace HNProxyAPI.Settings
     public class InboundAPISettings
     {
         /// <summary>
-        /// The min/max global request timeout for returning requested data (range: 1000 to 300000s)
+        /// The min/max global request timeout for returning requested data (range: 0 to 300000s)
         /// </summary>
         [Required]
-        [Range(1000, 30000, ErrorMessage = "Timeout for request to this API must be between 1000ms and 30000ms.")]
+        [Range(0, 30000, ErrorMessage = "Timeout for request to this API must be between 0ms and 30000ms.")]
         public int GlobalRequestTimeoutMs { get; set; } = 30000;
 
         /// <summary>
         /// Maximum number of requests per window (time), defined in RateLimitWindowSeconds (range: 1 to 10000)
         /// </summary>
         [Required]
-        [Range(1, 1000, ErrorMessage = "Maximum requests per window must be between 1 and 10000.")]
-        public int MaxRequestsPerWindow { get; set; } = 100;
+        [Range(1, 10000, ErrorMessage = "Maximum requests per window must be between 1 and 10000.")]
+        public int MaxRequestsPerWindow { get; set; } = 1000;
 
         /// <summary>
         /// Maximum window size in seconds to measure max quantity of requests (range: 1 to 360)

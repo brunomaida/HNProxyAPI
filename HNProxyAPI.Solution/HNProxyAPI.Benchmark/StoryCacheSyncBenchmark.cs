@@ -1,7 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 
 namespace HNProxyAPI.Benchmark
 {
+    [ShortRunJob]
     [MemoryDiagnoser]
     public class StoryCacheSyncBenchmark
     {

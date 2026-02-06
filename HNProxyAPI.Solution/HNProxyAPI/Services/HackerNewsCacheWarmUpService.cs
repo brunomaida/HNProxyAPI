@@ -26,7 +26,8 @@ namespace HNProxyAPI.Services
                 try
                 {
                     var items = await queryService.GetBestStoriesOrderedByScoreAsync(stoppingToken);
-                    _logger.LogInformation("[memory] Cache warm up completed with {items} items", items.Count());                    
+                    if (items.Any())
+                        _logger.LogInformation("[memory] Cache warm up completed with {items} items", items.Count());                    
                 }
                 catch (Exception ex)
                 {

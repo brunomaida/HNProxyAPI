@@ -8,6 +8,8 @@ namespace HNProxyAPI.Middlewares
     /// </summary>
     public class GlobalTimeout
     {
+        public const string TIMEOUT_MESSAGE = "API Global Timeout exceeded.";
+
         private readonly RequestDelegate _next;
 
         /// <summary>
@@ -43,12 +45,12 @@ namespace HNProxyAPI.Middlewares
             {
                 await _next(context);
             }
-            catch (OperationCanceledException) when (cts.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 if (!context.Response.HasStarted)
                 {
                     context.Response.StatusCode = StatusCodes.Status504GatewayTimeout;
-                    await context.Response.WriteAsync("API Global Timeout Global exceeded.");
+                    await context.Response.WriteAsync(TIMEOUT_MESSAGE);
                 }
             }
         }

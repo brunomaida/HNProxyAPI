@@ -1,4 +1,5 @@
 using HNProxyAPI.Extensions;
+using HNProxyAPI.Log;
 using HNProxyAPI.Metrics;
 using HNProxyAPI.Middlewares;
 using Microsoft.Extensions.Logging.AzureAppServices;
@@ -11,22 +12,12 @@ builder.Services.AddCustomRateLimiting();       // System Security and Performan
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// Tried to use latest Swachbuckle versions without success
-/*builder.Services.AddSwaggerGen(sgo =>
-{
-    sgo.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo()
-    { 
-        Title = "HNProxyAPI",
-        Version = "v1",
-        Description = "HackerNews Broker - Query first N best stories",        
-    });
-    sgo.CustomSchemaIds(type => type.ToString());
-});*/
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-builder.Logging.AddAzureWebAppDiagnostics();
-builder.Services.Configure<AzureFileLoggerOptions>(
-    builder.Configuration.GetSection("Logging:AzureAppServicesFile"));
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddChannelFileLogger("logs/hnproxyapi_log.txt");
 
 var app = builder.Build();
 
@@ -34,28 +25,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    /*
-    app.UseSwagger(c =>
-    {
-        c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
-        {
-            //  Forces specific version in the header 3.0.1 to achieve UI compatibility
-            swaggerDoc.Info.Version = "3.0.1";
-        });
-    });
-    app.UseSwaggerUI(o => {
-        o.SwaggerEndpoint("/swagger/v1/swagger.json", "HNProxyAPI v1");
-        o.RoutePrefix = string.Empty;
-        o.EnableValidator(null);
-    });*/
 }
 
+// Order is important: Timeout -> RateLimit -> Auth -> Controllers
+app.UseMiddleware<GlobalTimeout>();
 app.Services.GetRequiredService<SystemMetricsCollector>();
 app.UseHttpsRedirection();
-
-// Order is important: RateLimit -> Timeout -> Auth -> Controllers
 app.UseRateLimiter();
-app.UseMiddleware<GlobalTimeout>();
 app.UseAuthorization();
 app.MapHealthChecks("/health");
 app.MapControllers().RequireRateLimiting("GlobalPolicy");

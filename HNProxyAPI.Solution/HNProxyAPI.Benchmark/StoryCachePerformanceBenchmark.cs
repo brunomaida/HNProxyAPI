@@ -11,10 +11,11 @@ using System.Diagnostics.Metrics;
 namespace HNProxyAPI.Benchmark
 {
     // Global Benchmark Configurations
+    [ShortRunJob]
     [MemoryDiagnoser] // Essential: Shows allocated Bytes and GC collections (Gen 0, 1, 2)
     [RankColumn]      // Displays a ranking from fastest to slowest
     [SimpleJob(RuntimeMoniker.Net80)] // Ensures execution on .NET 8
-    public class StoryCachePerformanceBenchmark
+    public class StoryCachePerformanceBenchmark : IDisposable
     {
         private StoryCache _cache;
         private Story[] _dataset;
@@ -65,18 +66,14 @@ namespace HNProxyAPI.Benchmark
             }
         }
 
-        // --- SCENARIO 1: Sorting + Snapshot Cost ---
-        // Measures time taken to sort the list and perform the reference swap
-        // Measures temporary memory allocation during the process (auxiliary arrays)
+        // EXEC1: Sorting + Snapshot Cost ---
         [Benchmark]
         public async Task RebuildSnapshot_SortingTime()
         {
             await _cache.RebuildOrderedListAsync();
         }
 
-        // --- SCENARIO 2: Insertion Cost (Dictionary Overhead) ---
-        // Measures ConcurrentDictionary efficiency and atomic metrics (Interlocked)
-        // Note: We test adding items to measure real insertion overhead
+        // EXEC2: Insertion Cost (Dictionary Overhead) ---
         [Benchmark]
         public void InsertSingleItem_MemoryOverhead()
         {
@@ -86,12 +83,17 @@ namespace HNProxyAPI.Benchmark
             _cache.TryAdd(newStory);
         }
 
-        // --- SCENARIO 3: Reading (Baseline) ---
+        // EXEC3:: Reading (Baseline) ---
         // Proves that reading is O(1) and Zero Allocation
         [Benchmark]
         public IReadOnlyList<Story> ReadSnapshot_AccessTime()
         {
             return _cache.GetOrderedList();
+        }
+
+        public void Dispose()
+        {
+            _cache?.Dispose();
         }
     }
 }

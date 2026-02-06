@@ -1,15 +1,7 @@
 using HNProxyAPI.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
-using Moq.Protected;
-using System.Net;
 
 namespace HNProxyAPI.Tests.Integration.Setup
 {
@@ -51,16 +43,8 @@ namespace HNProxyAPI.Tests.Integration.Setup
             // Configure Services (Dependency Injection)
             builder.ConfigureTestServices(services =>
             {
-                //services.TryAddTransient<MetricsRequestHandler>();
-
                 services.AddHttpClient<IHackerNewsClient, HackerNewsClient>()
-                    //.AddHttpMessageHandler<MetricsRequestHandler>()
                     .ConfigurePrimaryHttpMessageHandler(() => MockHttpHandler.Object);
-
-                // Remove the real HttpClient registration and replace with our Mock
-                // We locate the IHackerNewsClient registration and replace the underlying handler
-                //services.AddHttpClient("HackerNewsClient")
-                //    .ConfigurePrimaryHttpMessageHandler(() => MockHttpHandler.Object);
 
                 // Disable excessive logging in tests
                 services.AddLogging(logging => logging.ClearProviders());

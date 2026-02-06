@@ -22,7 +22,7 @@ namespace HNProxyAPI.Tests.Integration
             // Setup minimal mock data so Warmup service succeeds
             _factory.MockHttpHandler.Protected()
                .Setup<Task<HttpResponseMessage>>("SendAsync",
-                   ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString().Contains("beststories.json")),
+                   ItExpr.Is<HttpRequestMessage>(r => r.RequestUri != null && r.RequestUri.ToString().Contains("beststories.json")),
                    ItExpr.IsAny<CancellationToken>())
                .ReturnsAsync(new HttpResponseMessage
                {
@@ -32,7 +32,7 @@ namespace HNProxyAPI.Tests.Integration
 
             _factory.MockHttpHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString().Contains("item/1.json")),
+                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri != null && r.RequestUri.ToString().Contains("item/1.json")),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage
                 {
@@ -44,7 +44,7 @@ namespace HNProxyAPI.Tests.Integration
 
             // Act
             // Wait a bit for the BackgroundService (WarmUp) to execute
-            HttpResponseMessage response = null;
+            HttpResponseMessage? response = null;
             string content = string.Empty;
 
             for (int i = 0; i < 5; i++) // Retry up to 5 times
@@ -52,7 +52,7 @@ namespace HNProxyAPI.Tests.Integration
                 response = await client.GetAsync("/health");
                 await Task.Delay(1000);
 
-                content = await response.Content.ReadAsStringAsync();
+                content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
                 if (response.StatusCode == HttpStatusCode.OK && content.Contains("Healthy"))
                     break;
@@ -60,7 +60,7 @@ namespace HNProxyAPI.Tests.Integration
 
             // #ASSERT
             // If it's still 503, the 'content' will help identify why.
-            response.StatusCode.Should().Be(HttpStatusCode.OK, because: $"Final health check failed with: {content}");
+            response?.StatusCode.Should().Be(HttpStatusCode.OK, because: $"Final health check failed with: {content}");
             content.Should().Contain("Healthy");
         }
     }

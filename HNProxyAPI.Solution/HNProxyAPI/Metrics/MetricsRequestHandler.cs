@@ -1,7 +1,6 @@
 using HNProxyAPI.Settings;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
 namespace HNProxyAPI.Metrics
@@ -19,7 +18,7 @@ namespace HNProxyAPI.Metrics
         private readonly Histogram<double> _requestDurationHistogram;
         private readonly Histogram<double> _queueWaitHistogram;
 
-        [Obsolete]
+        [Obsolete(" ")]
         public MetricsRequestHandler(IOptionsMonitor<HackerNewsServiceSettings> apiSettings,
                                      IMeterFactory meterFactory)
         {
@@ -55,6 +54,7 @@ namespace HNProxyAPI.Metrics
                 description: "Avg time spent waiting for a concurrency slot");
         }
 
+        /*
         [Obsolete]
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
@@ -128,6 +128,6 @@ namespace HNProxyAPI.Metrics
                 _requestActiveCounter.Add(-1, tags);
                 _requestDurationHistogram.Record(Stopwatch.GetElapsedTime(startWait).TotalMilliseconds, tags);
             }
-        }
+        }*/
     }
 }

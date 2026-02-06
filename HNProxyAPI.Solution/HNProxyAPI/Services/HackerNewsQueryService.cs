@@ -10,7 +10,7 @@ namespace HNProxyAPI.Services
     /// <summary>
     /// The orchestrator responsible to query HackerNews info, store data in memory e delivery the final result.    
     /// </summary>
-    public class HackerNewsQueryService
+    public class HackerNewsQueryService : IDisposable
     {
         private const string METER_NAME = "Network.HackerNewsQueryService";
 
@@ -126,6 +126,11 @@ namespace HNProxyAPI.Services
                     if (isLocked) _semGate.Release();
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            _semGate?.Dispose();
         }
     }
 }

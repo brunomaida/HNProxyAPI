@@ -8,6 +8,7 @@ obj/
 out/
 [Bb]in/
 [Oo]bj/
+Logs/
 
 # Visual Studio per-user files and cache
 .vs/

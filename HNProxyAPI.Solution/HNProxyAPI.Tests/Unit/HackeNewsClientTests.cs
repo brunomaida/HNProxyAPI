@@ -111,7 +111,7 @@ namespace HNProxyAPI.Tests.Unit
                 x => x.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Error retrieving")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Error retrieving")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -132,7 +132,7 @@ namespace HNProxyAPI.Tests.Unit
                 x => x.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("timeout/cancelled")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("timeout/cancelled")),
                     It.IsAny<OperationCanceledException>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -184,7 +184,7 @@ namespace HNProxyAPI.Tests.Unit
                 x => x.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Error retrieving Story")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Error retrieving Story")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -207,7 +207,7 @@ namespace HNProxyAPI.Tests.Unit
                x => x.Log(
                    LogLevel.Warning,
                    It.IsAny<EventId>(),
-                   It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("timeout/cancelled")),
+                   It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("timeout/cancelled")),
                    It.IsAny<OperationCanceledException>(),
                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                Times.Once);

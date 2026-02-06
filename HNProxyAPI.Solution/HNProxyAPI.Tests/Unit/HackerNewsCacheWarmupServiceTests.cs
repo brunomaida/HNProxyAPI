@@ -1,8 +1,6 @@
 using HNProxyAPI.Data;
 using HNProxyAPI.Services;
 using HNProxyAPI.Settings;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System.Diagnostics.Metrics;
@@ -100,7 +98,7 @@ namespace HNProxyAPI.Tests.Unit
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Cache warm up completed")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Cache warm up completed")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -109,7 +107,6 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public async Task ExecuteAsync_Should_Log_Critical_Error_On_Exception()
         {
-            // Arrange
             var expectedEx = new Exception("API is down!");
 
             // Configure the service to fail
@@ -134,7 +131,7 @@ namespace HNProxyAPI.Tests.Unit
                 x => x.Log(
                     LogLevel.Critical,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Failed to wamp up")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Failed to wamp up")),
                     expectedEx, // Verify if the passed exception is the one we generated
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);

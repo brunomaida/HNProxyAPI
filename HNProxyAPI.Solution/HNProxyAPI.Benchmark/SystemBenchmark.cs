@@ -9,9 +9,10 @@ using System.Diagnostics.Metrics;
 
 namespace HNProxyAPI.Benchmark
 {
+    [ShortRunJob]
     [MemoryDiagnoser] // allocated bytes and Garbage Collection (Gen 0/1/2)
     [ThreadingDiagnoser] // Lock Contention (SemaphoreSlim)
-    public class SystemBenchmark
+    public class SystemBenchmark : IDisposable
     {
         private HackerNewsQueryService _service;
         private StoryCache _realCache; // Real cache to measure actual memory impact
@@ -124,6 +125,11 @@ namespace HNProxyAPI.Benchmark
                 tasks[i] = Task.Run(() => _service.GetBestStoriesOrderedByScoreAsync(CancellationToken.None));
             }
             await Task.WhenAll(tasks);
+        }
+
+        public void Dispose()
+        {
+            _service.Dispose();
         }
     }
 }

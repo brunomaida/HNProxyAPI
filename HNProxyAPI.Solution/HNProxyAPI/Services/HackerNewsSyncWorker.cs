@@ -26,6 +26,7 @@ namespace HNProxyAPI.Services
                                     IOptionsMonitor<HackerNewsServiceSettings> settings, 
                                     IMeterFactory meterFactory)
         {
+            _timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
             _logger = logger;
             _serviceProvider = serviceProvider;
             _settings = settings;

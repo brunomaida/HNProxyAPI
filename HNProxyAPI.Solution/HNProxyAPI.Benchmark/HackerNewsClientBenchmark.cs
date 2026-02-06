@@ -1,19 +1,18 @@
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using HNProxyAPI.Data; // Ensure you have your models namespace
 using HNProxyAPI.Services;
 using HNProxyAPI.Settings;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.Metrics;
 using System.Net;
 
 namespace HNProxyAPI.Benchmark
 {
+    [ShortRunJob]
     [MemoryDiagnoser] // Tracks allocations (Gen 0/1/2)
     [SimpleJob(RuntimeMoniker.Net80)]
-    public class HackerNewsClientBenchmark
+    public class HackerNewsClientBenchmark : IDisposable
     {
         private HackerNewsClient _hnClient;
         private HttpClient _httpClient;
@@ -83,6 +82,11 @@ namespace HNProxyAPI.Benchmark
             // Benchmarks the object deserialization + metric recording + URL formatting
             return await _hnClient.GetStoryDetailsAsync(46829147, CancellationToken.None);
         }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
+        }
     }
 
     #region High-Performance Test Doubles (Stubs)
@@ -102,7 +106,7 @@ namespace HNProxyAPI.Benchmark
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var content = request.RequestUri.ToString().Contains("beststories")
+            var content = request != null && request.RequestUri!.ToString().Contains("beststories")
                 ? _idsJson
                 : _storyJson;
 
@@ -119,7 +123,7 @@ namespace HNProxyAPI.Benchmark
         public HackerNewsServiceSettings CurrentValue { get; }
         public FakeOptionsMonitor(HackerNewsServiceSettings settings) => CurrentValue = settings;
         public HackerNewsServiceSettings Get(string name) => CurrentValue;
-        public IDisposable OnChange(Action<HackerNewsServiceSettings, string> listener) => null;
+        public IDisposable? OnChange(Action<HackerNewsServiceSettings, string> listener) => null;
     }
 
     // Lightweight Stub for Meters

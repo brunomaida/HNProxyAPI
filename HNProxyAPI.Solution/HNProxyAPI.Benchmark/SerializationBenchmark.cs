@@ -1,9 +1,10 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using HNProxyAPI.Data;
 using System.Text.Json;
 
 namespace HNProxyAPI.Benchmark
 {
+    [ShortRunJob]
     [MemoryDiagnoser]
     public class SerializationBenchmark
     {

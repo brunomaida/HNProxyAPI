@@ -5,7 +5,6 @@ namespace HNProxyAPI.Tests.Unit
 {
     public class StoryMetricsTests
     {
-        // Constants extracted from class logic to simplify validation
         private const int BaseSize = 24 + 8 + 4; // Header(24) + Long(8) + Int(4) = 36 bytes
         private const int StringBaseCost = 8 + 26; // Reference(8) + Overhead(26) = 34 bytes
 
@@ -81,8 +80,8 @@ namespace HNProxyAPI.Tests.Unit
             var story = new Story
             {
                 id = 99,
-                title = "A",   // Present (1 char)
-                uri = null,    // Null (Cost 0 in this specific implementation)
+                title = "A",    // Present (1 char)
+                uri = null,     // Null (Cost 0 in this specific implementation)
                 postedBy = null // Null (Cost 0)
             };
             long size = StoryMetrics.EstimateMemorySizeOf(in story);

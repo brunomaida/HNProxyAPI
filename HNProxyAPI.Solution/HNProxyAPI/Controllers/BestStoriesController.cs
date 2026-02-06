@@ -27,7 +27,7 @@ namespace HackerNewsQueryAPI.Controllers
         /// <param name="ct">The Cancellation token used in the entire request.</param>
         /// <returns></returns>
         [HttpGet(Name = "GetBestStories")]
-        public async Task<IActionResult> Get([FromQuery] int n, CancellationToken ct)
+        public async Task<IActionResult> GetAsync([FromQuery] int n, CancellationToken ct)
         {
             if (n <= 0)
             {
@@ -44,11 +44,21 @@ namespace HackerNewsQueryAPI.Controllers
                     _logger.LogInformation("n({n}) > countof Stories({totalStories}): Will return all the ordered list in memory.", n, totalStories);
                 return Ok(result);
             }
-            catch (Exception ex)
+            /*(catch (OperationCanceledException)
+            {
+                var context = new DefaultHttpContext();
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.StatusCode = StatusCodes.Status504GatewayTimeout;
+                    await context.Response.WriteAsync(GlobalTimeout.TIMEOUT_MESSAGE);
+                }
+                return StatusCode(StatusCodes.Status504GatewayTimeout, "Operation timedout.");
+            }*/
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Error while retrieving the best stories.");
                 return StatusCode(500, "An internal error has occured while retrieving the best stories.");
             }
-        }
+        }       
     }
 }

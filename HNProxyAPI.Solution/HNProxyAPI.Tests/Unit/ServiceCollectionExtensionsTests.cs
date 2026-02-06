@@ -45,8 +45,8 @@ namespace HNProxyAPI.Tests.Unit
             var inboundSettings = provider.GetService<IOptions<InboundAPISettings>>();
 
             // #ASSERT
-            hnSettings.Value.UrlBase.Should().Be("https://test-api.com/");
-            inboundSettings.Value.MaxRequestsPerWindow.Should().Be(50);
+            hnSettings?.Value.UrlBase.Should().Be("https://test-api.com/");
+            inboundSettings?.Value.MaxRequestsPerWindow.Should().Be(50);
         }
 
         [Fact]

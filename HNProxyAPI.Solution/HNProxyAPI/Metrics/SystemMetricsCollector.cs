@@ -6,7 +6,7 @@ namespace HNProxyAPI.Metrics
     /// <summary>
     /// System metrics with observable values of heap, stack and threads for the process
     /// </summary>
-    public class SystemMetricsCollector
+    public class SystemMetricsCollector : IDisposable
     {
         private readonly Meter _meter;
         private readonly Process _currentProcess;
