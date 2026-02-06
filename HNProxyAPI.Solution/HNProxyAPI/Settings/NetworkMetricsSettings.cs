@@ -2,6 +2,7 @@
 
 namespace HNAPI.Settings
 {
+    [Obsolete]
     public class NetworkMetricsSettings
     {
         private const string METRICS_NETORK_NAME = "HackerNewsQueryAPI.Network";
