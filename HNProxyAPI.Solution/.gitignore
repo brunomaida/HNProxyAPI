@@ -1,0 +1,64 @@
+## [2026-02-05] C# Proxy API Gitignore
+## Root-level configuration for API, Tests, and Benchmark projects.
+
+# --- .NET / Visual Studio ---
+# Ignore build artifacts and temporary files
+bin/
+obj/
+out/
+[Bb]in/
+[Oo]bj/
+Logs/
+
+# Visual Studio per-user files and cache
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# --- Secrets and Configuration (CRITICAL FOR PROXY) ---
+# Do not commit sensitive credentials or production settings.
+# Use environment variables or Key Vaults for production secrets.
+appsettings.Production.json
+appsettings.Staging.json
+secrets.json
+*.pfx
+*.publishsettings
+
+# --- NuGet Packages ---
+# Packages are restored during the build process
+*.nupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.assets.json
+
+# --- Testing and Code Coverage ---
+# Artifacts from xUnit/NUnit and coverage tools like Coverlet
+TestResults/
+*.sequenced.json
+coverage/
+*.lcov
+*.coverage
+
+# --- BenchmarkDotNet ---
+# Specialized for the performance project. Ignore generated source and results.
+**/BenchmarkDotNet.Artifacts/
+
+# --- Docker ---
+# Ignore docker-specific build contexts
+.dockerignore
+**/obj/Docker/
+
+# --- Logs and Diagnostics ---
+# Standard log files and crash dumps
+*.log
+*.eventlog
+logs/
+*.stackdump
+
+# --- Operating System ---
+.DS_Store
+Thumbs.db
