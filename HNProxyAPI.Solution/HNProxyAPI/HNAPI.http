@@ -1,6 +1,0 @@
-@HNProxyAPI_HostAddress = http://localhost:5162
-
-GET {{HNProxyAPI_HostAddress}}/beststories/
-Accept: application/json
-
-###
