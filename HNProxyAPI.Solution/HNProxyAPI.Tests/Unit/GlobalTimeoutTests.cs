@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Middlewares;
 using HNProxyAPI.Settings;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +20,7 @@ namespace HNProxyAPI.Tests.Unit
         public async Task InvokeAsync_Should_Skip_Timeout_Logic_If_Setting_Is_Zero()
         {
             // Arrange
-            // 1. Configure settings to disable timeout (0)
+            // Configure settings to disable timeout (0)
             _mockSettings.Setup(x => x.CurrentValue).Returns(new InboundAPISettings
             {
                 GlobalRequestTimeoutMs = 0
@@ -28,7 +28,7 @@ namespace HNProxyAPI.Tests.Unit
 
             var context = new DefaultHttpContext();
 
-            // 2. Define a 'Next' delegate that takes a long time (simulating a slow process)
+            // Define a 'Next' delegate that takes a long time (simulating a slow process)
             // If the logic wasn't skipped, this would trigger a timeout.
             RequestDelegate next = async (ctx) =>
             {
@@ -41,8 +41,8 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             await middleware.InvokeAsync(context, _mockSettings.Object);
 
-            // Assert
-            // 3. Since logic was skipped, it waited the full 500ms and returned 200 OK
+            // #ASSERT
+            // Since logic was skipped, it waited the full 500ms and returned 200 OK
             context.Response.StatusCode.Should().Be(200);
         }
 
@@ -50,7 +50,7 @@ namespace HNProxyAPI.Tests.Unit
         public async Task InvokeAsync_Should_Return_200_If_Execution_Is_Within_Time_Limit()
         {
             // Arrange
-            // 1. Configure a generous timeout (1000ms)
+            // Configure a generous timeout (1000ms)
             _mockSettings.Setup(x => x.CurrentValue).Returns(new InboundAPISettings
             {
                 GlobalRequestTimeoutMs = 1000
@@ -58,7 +58,7 @@ namespace HNProxyAPI.Tests.Unit
 
             var context = new DefaultHttpContext();
 
-            // 2. Define a 'Next' delegate that runs quickly (10ms)
+            // Define a 'Next' delegate that runs quickly (10ms)
             RequestDelegate next = async (ctx) =>
             {
                 await Task.Delay(10);
@@ -70,7 +70,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             await middleware.InvokeAsync(context, _mockSettings.Object);
 
-            // Assert
+            // #ASSERT
             context.Response.StatusCode.Should().Be(200);
         }
 
@@ -78,7 +78,7 @@ namespace HNProxyAPI.Tests.Unit
         public async Task InvokeAsync_Should_Return_504_When_Timeout_Occurs()
         {
             // Arrange
-            // 1. Configure a strict timeout (50ms)
+            // Configure a strict timeout (50ms)
             _mockSettings.Setup(x => x.CurrentValue).Returns(new InboundAPISettings
             {
                 GlobalRequestTimeoutMs = 50
@@ -89,7 +89,7 @@ namespace HNProxyAPI.Tests.Unit
             // Initialize the response body stream to read the error message later
             context.Response.Body = new MemoryStream();
 
-            // 2. Define a 'Next' delegate that takes longer than the timeout (200ms)
+            // Define a 'Next' delegate that takes longer than the timeout (200ms)
             // CRITICAL: Pass the cancellation token to Task.Delay so it throws when cancelled
             RequestDelegate next = async (ctx) =>
             {
@@ -102,11 +102,11 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             await middleware.InvokeAsync(context, _mockSettings.Object);
 
-            // Assert
-            // 3. Verify status code
+            // #ASSERT
+            // Verify status code
             context.Response.StatusCode.Should().Be(StatusCodes.Status504GatewayTimeout);
 
-            // 4. Verify response body message
+            // Verify response body message
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             using var reader = new StreamReader(context.Response.Body);
             var body = await reader.ReadToEndAsync();
@@ -128,7 +128,7 @@ namespace HNProxyAPI.Tests.Unit
 
             var context = new DefaultHttpContext();
 
-            // 1. Simulate a client cancellation token triggering immediately
+            // Simulate a client cancellation token triggering immediately
             var clientCts = new CancellationTokenSource();
             clientCts.Cancel();
             context.RequestAborted = clientCts.Token;
@@ -146,7 +146,7 @@ namespace HNProxyAPI.Tests.Unit
             // because the internal 'cts' (timeout) did not trigger it.
             Func<Task> act = async () => await middleware.InvokeAsync(context, _mockSettings.Object);
 
-            // Assert
+            // #ASSERT
             await act.Should().ThrowAsync<OperationCanceledException>();
             context.Response.StatusCode.Should().NotBe(StatusCodes.Status504GatewayTimeout);
         }
@@ -162,7 +162,7 @@ namespace HNProxyAPI.Tests.Unit
 
             var context = new DefaultHttpContext();
 
-            // 1. Mock logic to simulate that response headers have already been sent
+            // Mock logic to simulate that response headers have already been sent
             //    DefaultHttpContext doesn't strictly enforce 'HasStarted' logic automatically in tests,
             //    so we just ensure our code checks the property, but testing the property setter relies on internal framework logic.
             //    Instead, we simulate the flow where we can't write.

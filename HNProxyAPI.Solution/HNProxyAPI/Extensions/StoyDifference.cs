@@ -1,4 +1,4 @@
-﻿namespace HNProxyAPI.Extensions
+namespace HNProxyAPI.Extensions
 {
     public static class StoryDifferences
     {
@@ -16,12 +16,12 @@
             if (incomingIds == null) incomingIds = Array.Empty<int>();
             if (currentCachedIds == null) currentCachedIds = Array.Empty<int>();
 
-            // 1. Create HashSets for O(1) lookups.
+            // Create HashSets for O(1) lookups.
             // Check if the input is already a HashSet to avoid allocation overhead.
             var incomingSet = incomingIds as HashSet<int> ?? new HashSet<int>(incomingIds);
             var cachedSet = currentCachedIds as HashSet<int> ?? new HashSet<int>(currentCachedIds);
 
-            // 2. Calculate IDs to ADD: Present in Incoming, Missing in Cache
+            // Calculate IDs to ADD: Present in Incoming, Missing in Cache
             var toAdd = new List<int>();
             foreach (var id in incomingSet)
             {
@@ -31,7 +31,7 @@
                 }
             }
 
-            // 3. Calculate IDs to REMOVE: Present in Cache, Missing in Incoming
+            // Calculate IDs to REMOVE: Present in Cache, Missing in Incoming
             var toRemove = new List<int>();
             foreach (var id in cachedSet)
             {

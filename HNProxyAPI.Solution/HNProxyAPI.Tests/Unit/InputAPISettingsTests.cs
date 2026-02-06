@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
 using HNProxyAPI.Settings;
 
@@ -18,14 +18,10 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void DefaultValues_Should_Be_Valid()
         {
-            // Arrange
             var settings = new InboundAPISettings();
-            // Assumindo que a classe tem valores default sensatos no construtor ou inicializadores
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().BeEmpty("as configurações padrão devem ser válidas para subir a API sem erros");
         }
 
@@ -34,13 +30,10 @@ namespace HNProxyAPI.Tests.Unit
         [InlineData(-1)] // Negativo
         public void MaxRequestsPerWindow_Should_Require_Positive_Value(int invalidValue)
         {
-            // Arrange
             var settings = new InboundAPISettings { MaxRequestsPerWindow = invalidValue };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(InboundAPISettings.MaxRequestsPerWindow)));
         }
 
@@ -50,44 +43,35 @@ namespace HNProxyAPI.Tests.Unit
         [InlineData(3601)] // Supondo que você limite a janela a no máximo 1 hora (3600s)
         public void RateLimitWindowSeconds_Should_Be_Within_Reasonable_Range(int invalidSeconds)
         {
-            // Arrange
             var settings = new InboundAPISettings { RateLimitWindowSeconds = invalidSeconds };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(InboundAPISettings.RateLimitWindowSeconds)));
         }
 
         [Fact]
         public void QueueLimit_Should_Not_Allow_Negative_Numbers()
         {
-            // Arrange
             var settings = new InboundAPISettings { QueueLimit = -1 };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(InboundAPISettings.QueueLimit)));
         }
 
         [Fact]
         public void Valid_Custom_Configuration_Should_Pass()
         {
-            // Arrange
             var settings = new InboundAPISettings
             {
                 MaxRequestsPerWindow = 1000,
                 RateLimitWindowSeconds = 60,
                 QueueLimit = 10
             };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().BeEmpty();
         }
     }

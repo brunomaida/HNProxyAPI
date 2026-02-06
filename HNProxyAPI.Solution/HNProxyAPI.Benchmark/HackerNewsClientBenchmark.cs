@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using HNProxyAPI.Data; // Ensure you have your models namespace
@@ -39,13 +39,13 @@ namespace HNProxyAPI.Benchmark
         [GlobalSetup]
         public void Setup()
         {
-            // 1. Create the Fake Network Handler (Zero Latency)
+            // Create the Fake Network Handler (Zero Latency)
             // We avoid 'Moq' library here because it uses Reflection, which is too slow for micro-benchmarks.
             var fakeHandler = new FakeHttpMessageHandler(IDS_JSON, STORY_JSON);
             _httpClient = new HttpClient(fakeHandler);
             _httpClient.BaseAddress = new Uri("https://hacker-news.firebaseio.com/");
 
-            // 2. Setup Options
+            // Setup Options
             // We use a manual stub implementation for maximum speed
             var optionsMonitor = new FakeOptionsMonitor(new HackerNewsServiceSettings
             {
@@ -53,14 +53,14 @@ namespace HNProxyAPI.Benchmark
                 UrlBaseStoryById = "v0/item/{0}.json"
             });
 
-            // 3. Setup Null Logger (We don't want to measure console output speed)
+            // Setup Null Logger (We don't want to measure console output speed)
             var logger = new Microsoft.Extensions.Logging.Abstractions.NullLogger<HackerNewsClient>();
 
-            // 4. Setup Meter Factory
+            // Setup Meter Factory
             // We use a dummy factory that returns a no-op meter to avoid OS-level counter overhead affecting results
             var meterFactory = new FakeMeterFactory();
 
-            // 5. Instantiate the System Under Test
+            // Instantiate the System Under Test
             _hnClient = new HackerNewsClient(_httpClient, logger, optionsMonitor, meterFactory);
         }
 

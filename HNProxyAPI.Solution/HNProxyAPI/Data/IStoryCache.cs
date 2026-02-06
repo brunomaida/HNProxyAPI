@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace HNProxyAPI.Data
 {
@@ -7,7 +7,7 @@ namespace HNProxyAPI.Data
     /// </summary>
     public interface IStoryCache
     {
-        bool IsEmpty { get; }
+        bool IsEmpty { get; } // Required for Cache "Healthy" validation status.
 
         bool Contains(int id);
 

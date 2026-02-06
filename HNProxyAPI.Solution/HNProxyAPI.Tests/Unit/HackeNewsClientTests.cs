@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using FluentAssertions;
 using HNProxyAPI.Data;
 using HNProxyAPI.Services;
@@ -19,7 +19,7 @@ namespace HNProxyAPI.Tests.Unit
 
         public HackerNewsClientTests()
         {
-            // 1. Setup de Settings
+            // Setup de Settings
             _mockSettings = new Mock<IOptionsMonitor<HackerNewsServiceSettings>>();
             _mockSettings.Setup(x => x.CurrentValue).Returns(new HackerNewsServiceSettings
             {
@@ -27,12 +27,9 @@ namespace HNProxyAPI.Tests.Unit
                 UrlBaseStoryById = "https://test.com/item/{0}.json"
             });
 
-            // 2. Setup de Logger (Dummy)
             _mockLogger = new Mock<ILogger<HackerNewsClient>>();
 
-            // 3. Setup de Metrics (Dummy para não quebrar o construtor)
             _mockMeterFactory = new Mock<IMeterFactory>();
-            // Quando Create for chamado, retorna um Meter real descartável ou Mock
             _mockMeterFactory
                 .Setup(f => f.Create(It.IsAny<MeterOptions>()))
                 .Returns((MeterOptions options) => new Meter(options.Name, options.Version, options.Tags));
@@ -77,8 +74,6 @@ namespace HNProxyAPI.Tests.Unit
             return new HackerNewsClient(httpClient, _mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
         }
 
-        #region GetCurrentStoriesAsync Tests
-
         [Fact]
         public async Task GetCurrentStoriesAsync_Should_Return_Ids_On_Success()
         {
@@ -93,7 +88,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var result = await sut.GetCurrentStoriesAsync(CancellationToken.None);
 
-            // Assert
+            // #ASSERT
             result.Should().NotBeNull();
             result.Should().HaveCount(4);
             result.Should().ContainInOrder(10, 20, 30, 40);
@@ -109,7 +104,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var result = await sut.GetCurrentStoriesAsync(CancellationToken.None);
 
-            // Assert
+            // #ASSERT
             result.Should().BeEmpty();
             // Verifica se logou erro
             _mockLogger.Verify(
@@ -131,7 +126,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var result = await sut.GetCurrentStoriesAsync(CancellationToken.None);
 
-            // Assert
+            // #ASSERT
             result.Should().BeEmpty();
             _mockLogger.Verify(
                 x => x.Log(
@@ -142,8 +137,6 @@ namespace HNProxyAPI.Tests.Unit
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
         }
-
-        #endregion
 
         #region GetStoryDetailsAsync Tests
 
@@ -173,7 +166,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var result = await sut.GetStoryDetailsAsync(12345, CancellationToken.None);
 
-            // Assert
+            // #ASSERT
             result.id.Should().Be(12345);
             result.title.Should().Be("Test Story");
             // Se o StoryConverter estiver funcionando corretamente, ele mapeia "url" para "uri" na struct
@@ -190,7 +183,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var result = await sut.GetStoryDetailsAsync(999, CancellationToken.None);
 
-            // Assert
+            // #ASSERT
             result.Should().Be(default(Story));
             result.id.Should().Be(0);
 
@@ -213,7 +206,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var result = await sut.GetStoryDetailsAsync(888, CancellationToken.None);
 
-            // Assert
+            // #ASSERT
             result.Should().Be(default(Story));
             result.id.Should().Be(0);
 
@@ -226,7 +219,5 @@ namespace HNProxyAPI.Tests.Unit
                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                Times.Once);
         }
-
-        #endregion
     }
 }

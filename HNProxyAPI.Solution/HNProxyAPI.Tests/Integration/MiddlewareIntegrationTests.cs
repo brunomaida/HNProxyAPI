@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Services;
 using HNProxyAPI.Settings;
 using HNProxyAPI.Tests.Integration.Setup;
@@ -28,7 +28,7 @@ namespace HNProxyAPI.Tests.Integration
         {
             try
             {
-                // 1. Create a local Mock specifically for this test to avoid cross-test pollution
+                // Create a local Mock specifically for this test to avoid cross-test pollution
                 var mockHandler = new Mock<HttpMessageHandler>();
 
                 // Setup the delay to be significantly longer than the timeout (250ms > 50ms)
@@ -44,7 +44,7 @@ namespace HNProxyAPI.Tests.Integration
                     });
 
             
-                // 2. Configure a customized Test Server using WithWebHostBuilder
+                // Configure a customized Test Server using WithWebHostBuilder
                 var strictClient = _factory.WithWebHostBuilder(builder =>
                 {
                     builder.ConfigureTestServices(services =>
@@ -61,7 +61,7 @@ namespace HNProxyAPI.Tests.Integration
                 // Since this is a new isolated server, the cache is empty, forcing a network call to our slow mock
                 var response = await strictClient.GetAsync("/api/stories/best");
 
-                // Assert
+                // #ASSERT
                 // The GlobalTimeout middleware should catch the cancellation and return 504 Gateway Timeout
                 response.StatusCode.Should().Be(HttpStatusCode.GatewayTimeout);
             }
@@ -76,7 +76,7 @@ namespace HNProxyAPI.Tests.Integration
             try
             {
                 // Arrange
-                // 1. Configure Rate Limiting: 2 requests allowed per 10-second window
+                // Configure Rate Limiting: 2 requests allowed per 10-second window
                 var limitedClient = _factory.WithWebHostBuilder(builder =>
                 {
                     builder.ConfigureAppConfiguration((ctx, conf) =>

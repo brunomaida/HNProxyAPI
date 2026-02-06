@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Settings;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,13 +18,11 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void DefaultValues_Should_Be_Valid()
         {
-            // Arrange
             var settings = new HackerNewsServiceSettings(); // Usa os defaults
 
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().BeEmpty("os valores padrão devem sempre ser válidos");
             settings.MaxConcurrentRequests.Should().Be(20);
             settings.RequestTimeoutMs.Should().Be(10000);
@@ -37,16 +35,13 @@ namespace HNProxyAPI.Tests.Unit
         [InlineData("")] // Required falha aqui também ou Url
         public void UrlBase_Should_Fail_On_Invalid_Format(string invalidUrl)
         {
-            // Arrange
             var settings = new HackerNewsServiceSettings
             {
                 UrlBase = invalidUrl
             };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(HackerNewsServiceSettings.UrlBase)));
             results.Should().HaveCountGreaterThan(0);
         }
@@ -56,13 +51,10 @@ namespace HNProxyAPI.Tests.Unit
         [InlineData(15001)] // Acima do max (15000)
         public void RequestTimeoutMs_Should_Respect_Range(int invalidTimeout)
         {
-            // Arrange
             var settings = new HackerNewsServiceSettings { RequestTimeoutMs = invalidTimeout };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(HackerNewsServiceSettings.RequestTimeoutMs)));
             results.First(r => r.MemberNames.Contains("RequestTimeoutMs"))
                    .ErrorMessage.Should().Contain("Request timeout range");
@@ -73,13 +65,10 @@ namespace HNProxyAPI.Tests.Unit
         [InlineData(201)] // Acima do max (200)
         public void MaxConcurrentRequests_Should_Respect_Range(int invalidConcurrency)
         {
-            // Arrange
             var settings = new HackerNewsServiceSettings { MaxConcurrentRequests = invalidConcurrency };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(HackerNewsServiceSettings.MaxConcurrentRequests)));
         }
 
@@ -98,21 +87,17 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void MaxMemoryThresholdBytes_Should_Fail_If_Too_Low()
         {
-            // Arrange
-            // Mínimo é 50KB (50 * 1024 = 51200)
+            // Minimum is 50KB (50 * 1024 = 51200)
             var settings = new HackerNewsServiceSettings { MaxMemoryThresholdBytes = 51199 };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().Contain(r => r.MemberNames.Contains(nameof(HackerNewsServiceSettings.MaxMemoryThresholdBytes)));
         }
 
         [Fact]
         public void Settings_Should_Pass_With_Custom_Valid_Values()
         {
-            // Arrange
             var settings = new HackerNewsServiceSettings
             {
                 HttpClientName = "MyCustomClient",
@@ -123,11 +108,9 @@ namespace HNProxyAPI.Tests.Unit
                 AverageObjectSizeBytes = 512,
                 MaxMemoryThresholdBytes = 60 * 1024 // 60KB (Válido > 50KB)
             };
-
-            // Act
             var results = ValidateModel(settings);
 
-            // Assert
+            // #ASSERT
             results.Should().BeEmpty();
         }
     }

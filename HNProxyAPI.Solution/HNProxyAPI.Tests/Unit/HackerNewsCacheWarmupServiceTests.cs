@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Data;
+using HNProxyAPI.Data;
 using HNProxyAPI.Services;
 using HNProxyAPI.Settings;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,12 +43,11 @@ namespace HNProxyAPI.Tests.Unit
             _mockQueryService = new Mock<HackerNewsQueryService>(
                 Mock.Of<IHackerNewsClient>(),
                 Mock.Of<IStoryCache>(),
-                _mockSettings.Object, // Use o mock configurado, não null ou dummy
+                _mockSettings.Object,
                 Mock.Of<ILogger<HackerNewsQueryService>>(),
-                _mockScopeMeter.Object // <--- AQUI: Passa o mock configurado que retorna o Meter real
+                _mockScopeMeter.Object
             );
 
-            // Configure mock scope
             _mockRootServiceProvider
                 .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
                 .Returns(_mockScopeFactory.Object);
@@ -90,6 +89,7 @@ namespace HNProxyAPI.Tests.Unit
             // Allow the background service (WarmUp) to finish processing
             await Task.Delay(500);
 
+            // #ASSERT
             // Verify if the load method was called
             _mockQueryService.Verify(
                 s => s.GetBestStoriesOrderedByScoreAsync(It.IsAny<CancellationToken>()),
@@ -127,8 +127,8 @@ namespace HNProxyAPI.Tests.Unit
 
             // Allow the background service (WarmUp) to finish processing
             await Task.Delay(500);
-            // Assert
 
+            // #ASSERT
             // Verify if CRITICAL was logged with the correct exception
             _mockLogger.Verify(
                 x => x.Log(

@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Settings;
+using HNProxyAPI.Settings;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -107,7 +107,7 @@ namespace HNProxyAPI.Data
         /// <returns></returns>
         public bool TryAdd(Story story)
         {
-            // 1. Memory Limit Check (Heuristic)
+            // Memory Limit Check (Heuristic)
             long avgSize = Interlocked.Read(ref _averageObjectSizeBytes);
             avgSize = (avgSize == 0 ? _settings.CurrentValue.AverageObjectSizeBytes : avgSize);
 
@@ -166,18 +166,18 @@ namespace HNProxyAPI.Data
             await _semCacheLock.WaitAsync();
             try
             {
-                // 1. Snapshot of current values
+                // Snapshot of current values
                 var storiesArray = _storyCache.Values.ToArray();
 
                 if (storiesArray.Length == 0) return;
 
-                // 2. Sorting (CPU Bound)
+                // Sorting (CPU Bound)
                 Array.Sort(storiesArray, ScoreComparison);
 
-                // 3. Atomic List Swap
+                // Atomic List Swap
                 _orderedList = ImmutableArray.Create(storiesArray);
 
-                // 4. Average Recalibration (Logarithmic Sampling)
+                // Average Recalibration (Logarithmic Sampling)
                 RecalculateAverageSize(storiesArray);
 
                 _logger.LogInformation(

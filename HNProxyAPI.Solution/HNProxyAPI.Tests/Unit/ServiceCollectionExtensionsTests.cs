@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Data;
 using HNProxyAPI.Extensions;
 using HNProxyAPI.Services;
@@ -36,7 +36,6 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void AddAppConfiguration_Should_Bind_And_Validate_Settings()
         {
-            // Arrange
             var services = new ServiceCollection();
             services.AddSingleton(_configuration); 
             services.AddAppConfiguration();
@@ -45,6 +44,7 @@ namespace HNProxyAPI.Tests.Unit
             var hnSettings = provider.GetService<IOptions<HackerNewsServiceSettings>>();
             var inboundSettings = provider.GetService<IOptions<InboundAPISettings>>();
 
+            // #ASSERT
             hnSettings.Value.UrlBase.Should().Be("https://test-api.com/");
             inboundSettings.Value.MaxRequestsPerWindow.Should().Be(50);
         }
@@ -52,32 +52,29 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void AddHackerNewsInfrastructure_Should_Register_Core_Services()
         {
-            // Arrange
             var services = new ServiceCollection();
             services.AddSingleton(_configuration);
             services.AddAppConfiguration(); // Necessário pois a infra depende das settings
             services.AddLogging(); // Necessário para os loggers internos
             services.AddHackerNewsInfrastructure();
 
-            // Singleton Cache
             var cacheDescriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IStoryCache));
             cacheDescriptor.Should().NotBeNull();
             cacheDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
 
-            // Query Service
             var queryDescriptor = services.FirstOrDefault(s => s.ServiceType == typeof(HackerNewsQueryService));
             queryDescriptor.Should().NotBeNull();
             queryDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
 
-            // Hosted Service
             var hostedService = services.FirstOrDefault(s => s.ImplementationType == typeof(HackerNewsCacheWarmUpService));
+
+            // #ASSERT
             hostedService.Should().NotBeNull();
         }
 
         [Fact]
         public void AddHackerNewsInfrastructure_Should_Configure_HttpClient_Correctly()
         {
-            // Arrange
             var services = new ServiceCollection();
             services.AddSingleton(_configuration);
             services.AddAppConfiguration();
@@ -88,6 +85,7 @@ namespace HNProxyAPI.Tests.Unit
             var clientFactory = provider.GetRequiredService<IHttpClientFactory>();
             var client = clientFactory.CreateClient(typeof(IHackerNewsClient).Name);
 
+            // #ASSERT
             client.BaseAddress.Should().Be(new Uri("https://test-api.com/"));
             client.Timeout.Should().Be(Timeout.InfiniteTimeSpan);
         }
@@ -99,6 +97,8 @@ namespace HNProxyAPI.Tests.Unit
             services.AddSingleton(_configuration);
             services.AddAppConfiguration();
             services.AddCustomRateLimiting();
+
+            // #ASSERT
             services.Any(x => x.ServiceType.Name.Contains("RateLimiting")).Should().BeTrue();
         }
     }

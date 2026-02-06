@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Data;
 
 namespace HNProxyAPI.Tests.Unit
@@ -28,7 +28,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
-            // Assert
+            // #ASSERT
             // Expected calculation: 24 (Header) + 8 (Long) + 4 (Int) = 36 bytes
             size.Should().Be(36);
         }
@@ -49,7 +49,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
-            // Assert
+            // #ASSERT
             // Base (36) + 3 empty strings
             // Empty string cost: 8 (Ref) + 26 (Overhead) + 0 (Chars) = 34 bytes
             // Total: 36 + (34 * 3) = 138 bytes
@@ -71,7 +71,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
-            // Assert
+            // #ASSERT
             // Base: 36
 
             // Title: 34 (BaseStr) + (5 chars * 2 bytes) = 44 bytes
@@ -97,7 +97,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
-            // Assert
+            // #ASSERT
             // Base: 36
             // Title: 34 + (1 * 2) = 36 bytes
             // Uri: 0
@@ -125,7 +125,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
-            // Assert
+            // #ASSERT
             size.Should().Be(expectedSize);
         }
     }

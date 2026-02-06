@@ -1,4 +1,4 @@
-﻿/*
+/*
 using HNProxyAPI.Data;
 using HNProxyAPI.Settings;
 using Microsoft.Extensions.Logging;
@@ -245,7 +245,7 @@ namespace HNProxyAPI.Services
 
             long size = ObjectHeaderSize;
 
-            // 1. Strings (C# usa UTF-16, então é char length * 2)
+            // Strings (C# usa UTF-16, então é char length * 2)
             // Adicionamos o overhead da classe String e o ponteiro para ela
             if (story.title != null)
                 size += ReferenceSize + StringOverhead + story.title.Length * 2;
@@ -256,7 +256,7 @@ namespace HNProxyAPI.Services
             if (story.postedBy != null)
                 size += ReferenceSize + StringOverhead + story.postedBy.Length * 2;
 
-            // 2. Value Types (Structs já estão 'inline' na memória do objeto ou registradores, 
+            // Value Types (Structs já estão 'inline' na memória do objeto ou registradores, 
             // mas ocupam espaço no layout da classe)
             size += sizeof(long); // Score ou Time (se for long)
             size += sizeof(int);  // Id

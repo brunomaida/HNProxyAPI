@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Data;
 using HNProxyAPI.Tests.Integration.Setup;
 using Moq;
@@ -20,7 +20,7 @@ namespace HNProxyAPI.Tests.Integration
         [Fact]
         public async Task Get_BestStories_Should_Return_200_And_Correct_Json()
         {            
-            // 1. Mock the External API responses
+            // Mock the External API responses
             // Step A: Return list of IDs
             _factory.MockHttpHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
@@ -69,7 +69,7 @@ namespace HNProxyAPI.Tests.Integration
             // Act
             var response = await client.GetAsync("/api/beststories?n=2"); 
 
-            // Assert
+            // #ASSERT
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stories = await response.Content.ReadFromJsonAsync<List<Story>>();

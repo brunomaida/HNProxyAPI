@@ -15,15 +15,11 @@ namespace HNProxyAPI.Tests.Unit
         private readonly Mock<ILogger<StoryCache>> _mockLogger;
         private readonly Mock<IMeterFactory> _mockMeterFactory;
 
-        // SUT = System Under Test
-        private readonly StoryCache sut;
-
         public StoryCacheTests()
         {
-            // 1. Setup do Logger
             _mockLogger = new Mock<ILogger<StoryCache>>();
 
-            // 2. Setup das Configurações (Default: 100MB de limite para testes felizes)
+            // Setup das ConfiguraÃ§Ãµes (Default: 100MB de limite para testes felizes)
             _mockSettings = new Mock<IOptionsMonitor<HackerNewsServiceSettings>>();
             _mockSettings.Setup(x => x.CurrentValue).Returns(new HackerNewsServiceSettings
             {
@@ -31,15 +27,11 @@ namespace HNProxyAPI.Tests.Unit
                 AverageObjectSizeBytes = 1024 // 1 KB default
             });
 
-            // 3. Setup do MeterFactory (Crítico para não dar NullReference no construtor)
             _mockMeterFactory = new Mock<IMeterFactory>();
-            // Quando Create for chamado, retorna um Meter real descartável ou Mock
             _mockMeterFactory
                 .Setup(f => f.Create(It.IsAny<MeterOptions>()))
                 .Returns((MeterOptions options) => new Meter(options.Name, options.Version, options.Tags));
 
-            // Sets the class for every test
-            //_sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
         }
 
         #region TryAdd & Memory Limits
@@ -47,31 +39,23 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void TryAdd_Should_AddItem_When_MemoryIsAvailable()
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
-
-            // Arrange
             var story = CreateStory(1, 100);
-
-            // Act
             bool result = sut.TryAdd(story);
 
-            // Assert
+            // #ASSERT
             result.Should().BeTrue();
             sut.Contains(1).Should().BeTrue();
             // Verifica se o contador interno subiu (indiretamente pelo Count do dictionary)
-            // Nota: Não conseguimos testar _currentMemoryUsageBytes diretamente pois é privado, 
-            // mas testamos o comportamento de aceitação.
+            // Nota: NÃ£o conseguimos testar _currentMemoryUsageBytes diretamente pois Ã© privado, 
+            // mas testamos o comportamento de aceitaÃ§Ã£o.
         }
 
         [Fact]
         public void TryAdd_Should_RejectItem_When_MemoryLimitIsExceeded()
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
 
-            // Arrange
-            // Configura um limite EXTREMAMENTE baixo (1 Byte) para forçar o erro
             _mockSettings.Setup(x => x.CurrentValue).Returns(new HackerNewsServiceSettings
             {
                 MaxMemoryThresholdBytes = 1,
@@ -80,31 +64,26 @@ namespace HNProxyAPI.Tests.Unit
 
             var story = CreateStory(2, 100);
 
-            // Act
             bool result = sut.TryAdd(story);
 
-            // Assert
-            result.Should().BeFalse("o cache deveria rejeitar a inserção por falta de memória");
+            // #ASSERT
+            result.Should().BeFalse("o cache deveria rejeitar a inserÃ§Ã£o por falta de memÃ³ria");
             sut.Contains(2).Should().BeFalse();
 
-            // Verifica se logou o warning correto
+            // #ASSERT
             VerifyLogger(LogLevel.Warning, "Memory Full");
         }
 
         [Fact]
         public void TryAdd_Should_ReturnTrue_If_ItemAlreadyExists()
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
-
-            // Arrange
             var story = CreateStory(1, 100);
             sut.TryAdd(story);
 
-            // Act - Adiciona o mesmo ID de novo
             bool result = sut.TryAdd(story);
 
-            // Assert
+            // #ASSERT
             result.Should().BeTrue("TryAdd deve ser idempotente");
             sut.Contains(1).Should().BeTrue();
         }
@@ -129,25 +108,20 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             sut.RemoveOldIds(idsToRemove);
 
-            // Assert
+            // #ASSERT
             sut.Contains(10).Should().BeFalse();
             sut.Contains(20).Should().BeFalse();
-            sut.Contains(30).Should().BeTrue("ID 30 não estava na lista de remoção");
+            sut.Contains(30).Should().BeTrue("ID 30 nÃ£o estava na lista de remoÃ§Ã£o");
         }
 
         [Fact]
         public void RemoveOldIds_Should_Handle_EmptyList_Gracefully()
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
-
-            // Arrange
             sut.TryAdd(CreateStory(1, 100));
-
-            // Act
             sut.RemoveOldIds(new int[] { });
 
-            // Assert
+            // #ASSERT
             sut.Contains(1).Should().BeTrue();
         }
 
@@ -158,19 +132,15 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public async Task RebuildOrderedListAsync_Should_SortByScore_Descending()
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
-
-            // Arrange
             sut.TryAdd(CreateStory(1, score: 10));  // Baixo
             sut.TryAdd(CreateStory(2, score: 100)); // Alto
-            sut.TryAdd(CreateStory(3, score: 50));  // Médio
+            sut.TryAdd(CreateStory(3, score: 50));  // MÃ©dio
 
-            // Act
             await sut.RebuildOrderedListAsync();
             var list = sut.GetOrderedList();
 
-            // Assert
+            // #ASSERT
             list.Should().HaveCount(3);
             list[0].id.Should().Be(2); // Score 100
             list[1].id.Should().Be(3); // Score 50
@@ -180,22 +150,19 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public async Task RebuildOrderedListAsync_Should_Update_Snapshot_Instance()
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
 
-            // Arrange
             sut.TryAdd(CreateStory(1, 10));
             await sut.RebuildOrderedListAsync();
             var snapshot1 = sut.GetOrderedList();
 
-            // Act
             sut.TryAdd(CreateStory(2, 20));
             await sut.RebuildOrderedListAsync();
             var snapshot2 = sut.GetOrderedList();
 
-            // Assert
-            snapshot1.Should().NotBeSameAs(snapshot2, "o snapshot deve ser uma nova referência imutável após o rebuild");
-            snapshot1.Should().HaveCount(1, "o snapshot antigo não deve ser alterado");
+            // #ASSERT
+            snapshot1.Should().NotBeSameAs(snapshot2, "o snapshot deve ser uma nova referÃªncia imutÃ¡vel apÃ³s o rebuild");
+            snapshot1.Should().HaveCount(1, "o snapshot antigo nÃ£o deve ser alterado");
             snapshot2.Should().HaveCount(2, "o snapshot novo deve conter os novos dados");
         }
 
@@ -205,10 +172,8 @@ namespace HNProxyAPI.Tests.Unit
 
         private Story CreateStory(int id, int score)
         {
-            // Sets the class for every test
             var sut = new StoryCache(_mockLogger.Object, _mockSettings.Object, _mockMeterFactory.Object);
 
-            // Criação manual da struct Story baseada no que você usou anteriormente
             return new Story
             {
                 id = id,

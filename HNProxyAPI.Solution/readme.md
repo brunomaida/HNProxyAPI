@@ -1,4 +1,4 @@
-﻿# Hacker News Proxy API
+# Hacker News Proxy API
 
 This solution is a RESTFUL API built with **.NET 8 (C#)** that acts as an optimized, intelligent proxy for Hacker News.
 
@@ -30,8 +30,8 @@ You can execute the application using the .NET CLI, Docker, or Visual Studio. Be
 ### Option A: Using .NET CLI (Recommended for Devs)
 1.  Navigate to the API project directory:
     ```bash
-    cd src/HNProxyAPI.Api
-    ```
+    cd HNProxyAPI
+
 2.  Restore dependencies and build the project:
     ```bash
     dotnet restore
@@ -52,7 +52,7 @@ Run the API in an isolated Linux container to simulate a production environment.
 1.  Navigate to the **solution root** folder.
 2.  Build the Docker image:
     ```bash
-    docker build -t hnapi-proxy -f src/HNProxyAPI.Api/Dockerfile .
+    docker build -t hnapi-proxy -f HNProxyAPI/Dockerfile .
     ```
 3.  Run the container (mapping port 8080):
     ```bash

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Data;
 using System.Text.Json;
 
@@ -36,7 +36,7 @@ namespace HNProxyAPI.Tests.Unit
             // Act
             var story = JsonSerializer.Deserialize<Story>(json, _options);
 
-            // Assert
+            // #ASSERT
             story.Should().NotBeNull();
             story.id.Should().Be(8863);
             story.score.Should().Be(111);
@@ -48,13 +48,11 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void Deserialize_WhenTimeIsMissing_ShouldNotThrow()
         {
-            // Arrange - JSON without the 'time' property
+            // JSON without the 'time' property
             string json = @"{ ""id"": 123, ""title"": ""No Time Story"" }";
-
-            // Act
             var story = JsonSerializer.Deserialize<Story>(json, _options);
 
-            // Assert
+            // #ASSERT
             story.id.Should().Be(123);
             story.time.Should().Be(default(DateTime));
         }
@@ -62,13 +60,11 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void Deserialize_WhenFieldsAreInDifferentOrder_ShouldStillWork()
         {
-            // Arrange - JSON order changed
+            // JSON order changed
             string json = @"{ ""title"": ""Ordered"", ""id"": 999, ""score"": 10 }";
-
-            // Act
             var story = JsonSerializer.Deserialize<Story>(json, _options);
 
-            // Assert
+            // #ASSERT
             story.id.Should().Be(999);
             story.title.Should().Be("Ordered");
             story.score.Should().Be(10);
@@ -77,21 +73,18 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void Deserialize_InvalidTimeFormat_ShouldHandleDefensively()
         {
-            // Arrange - Time as a string instead of number (if your converter supports it)
+            // Time as a string instead of number (if your converter supports it)
             string json = @"{ ""id"": 1, ""time"": ""1175714200"" }";
-
-            // Act
             var story = JsonSerializer.Deserialize<Story>(json, _options);
 
-            // Assert
+            // #ASSERT
             // With the TryParse logic added previously, this should now pass
             story.time.Year.Should().Be(2007);
         }
 
         [Fact]
         public void Serialize_StoryObject_ShouldProduceValidJson()
-        {
-            // Arrange
+        {            
             var story = new Story
             {
                 id = 55,
@@ -99,11 +92,9 @@ namespace HNProxyAPI.Tests.Unit
                 score = 20,
                 time = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
-
-            // Act
             var json = JsonSerializer.Serialize(story, _options);
 
-            // Assert
+            // #ASSERT
             json.Should().Contain(@"""id"":55");
             json.Should().Contain(@"""title"":""Export Test""");
             json.Should().Contain(@"""score"":20");

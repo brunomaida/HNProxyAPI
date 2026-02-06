@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using HNProxyAPI.Data;
 using HNProxyAPI.Services;
 using HNProxyAPI.Settings;
@@ -20,18 +20,18 @@ namespace HNProxyAPI.Benchmark
         private Mock<ILogger<IStoryCache>> _mockLogger;
         private Mock<IOptionsMonitor<HackerNewsServiceSettings>> _mockSettings;
 
-        // 1. SCALABILITY: Number of records to process
+        // SCALABILITY: Number of records to process
         [Params(100, 1_000, 10_000)]
         public int RecordCount;
 
-        // 2. CONCURRENCY: Number of parallel threads accessing the service
+        // CONCURRENCY: Number of parallel threads accessing the service
         [Params(1, 50)]
         public int ConcurrentReaders;
 
         [GlobalSetup]
         public void Setup()
         {
-            // 1. Configure Settings (MaxConcurrentRequests affects Parallel.ForEachAsync)
+            // Configure Settings (MaxConcurrentRequests affects Parallel.ForEachAsync)
             _mockSettings = new Mock<IOptionsMonitor<HackerNewsServiceSettings>>();
             _mockSettings.Setup(s => s.CurrentValue).Returns(new HackerNewsServiceSettings
                 {
@@ -46,14 +46,14 @@ namespace HNProxyAPI.Benchmark
                 .Setup(f => f.Create(It.IsAny<MeterOptions>()))
                 .Returns((MeterOptions options) => new Meter(options.Name, options.Version, options.Tags));
 
-            // 2. Configure Cache (Real implementation to test integration)
+            // Configure Cache (Real implementation to test integration)
             _realCache = new StoryCache(
                 _mockLogger.Object,
                 _mockSettings.Object,
                 _mockMeterFactory.Object
             );
 
-            // 3. Configure Client Mock
+            // Configure Client Mock
             _mockClient = new Mock<IHackerNewsClient>();
 
             // Setup: Returns a list of IDs based on RecordCount
@@ -70,7 +70,7 @@ namespace HNProxyAPI.Benchmark
                            score = 100
                        });
 
-            // 4. Instantiate the System Under Test (SUT)
+            // Instantiate the System Under Test (SUT)
             _service = new HackerNewsQueryService(
                 _mockClient.Object,
                 _realCache,

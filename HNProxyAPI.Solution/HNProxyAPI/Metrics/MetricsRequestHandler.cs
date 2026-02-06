@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Settings;
+using HNProxyAPI.Settings;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
@@ -26,7 +26,7 @@ public class MetricsRequestHandler : DelegatingHandler
         // _meter = new Meter(METER_NAME);
         _meter = meterFactory.Create(METER_NAME);
 
-        // 2. Define Instruments
+        // Define Instruments
         // Counter: Cumulative total (Good for rates/throughput)
         _requestCompletedCounter = _meter.CreateCounter<long>(
             "http.client.requests_total",
@@ -69,7 +69,7 @@ public class MetricsRequestHandler : DelegatingHandler
 
         try
         {
-            // 1. Wait for throttle slot 
+            // Wait for throttle slot 
             await _semaphore.WaitAsync(ctsTimeout.Token);
 
             // Record Queue Duration

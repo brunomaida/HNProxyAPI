@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using HNProxyAPI.Data;
@@ -27,7 +27,7 @@ namespace HNProxyAPI.Benchmark
         [GlobalSetup]
         public void Setup()
         {
-            // 1. Configuration Mock (Allowing unlimited memory so the test doesn't fail)
+            // Configuration Mock (Allowing unlimited memory so the test doesn't fail)
             var mockSettings = new Mock<IOptionsMonitor<HackerNewsServiceSettings>>();
             mockSettings.Setup(s => s.CurrentValue).Returns(new HackerNewsServiceSettings
             {
@@ -35,7 +35,7 @@ namespace HNProxyAPI.Benchmark
                 AverageObjectSizeBytes = 256
             });
 
-            // 2. Lightweight Dependency Mocks
+            // Lightweight Dependency Mocks
             var mockLogger = new Mock<ILogger<StoryCache>>();
             var mockMeterFactory = new Mock<System.Diagnostics.Metrics.IMeterFactory>();
 
@@ -45,7 +45,7 @@ namespace HNProxyAPI.Benchmark
 
             _cache = new StoryCache(mockLogger.Object, mockSettings.Object, mockMeterFactory.Object);
 
-            // 3. Random Data Generation (To force the Sort algorithm to work)
+            // Random Data Generation (To force the Sort algorithm to work)
             var rnd = new Random(42); // Fixed seed for reproducibility
             _dataset = new Story[ItemCount];
 

@@ -25,12 +25,12 @@ namespace HNProxyAPI.Tests.Integration.Setup
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            // 1. Force environment to specific value if needed
+            // Force environment to specific value if needed
             builder.UseEnvironment("Testing");
 
             builder.UseContentRoot(Directory.GetCurrentDirectory());
 
-            // 2. Override Configuration (appsettings)
+            // Override Configuration (appsettings)
             builder.ConfigureAppConfiguration((context, conf) =>
             {
                 var newConfig = new Dictionary<string, string>
@@ -48,7 +48,7 @@ namespace HNProxyAPI.Tests.Integration.Setup
                 conf.AddInMemoryCollection(newConfig);
             });
 
-            // 3. Configure Services (Dependency Injection)
+            // Configure Services (Dependency Injection)
             builder.ConfigureTestServices(services =>
             {
                 //services.TryAddTransient<MetricsRequestHandler>();

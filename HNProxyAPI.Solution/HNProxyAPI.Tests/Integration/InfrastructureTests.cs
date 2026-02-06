@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HNProxyAPI.Tests.Integration.Setup;
 using Moq;
 using Moq.Protected;
@@ -58,7 +58,7 @@ namespace HNProxyAPI.Tests.Integration
                     break;
             }
 
-            // 4. Assert
+            // #ASSERT
             // If it's still 503, the 'content' will help identify why.
             response.StatusCode.Should().Be(HttpStatusCode.OK, because: $"Final health check failed with: {content}");
             content.Should().Contain("Healthy");
