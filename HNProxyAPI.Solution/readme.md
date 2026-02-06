@@ -59,7 +59,9 @@ Run the API in an isolated container to simulate a production environment.
    ```bash
    docker run --rm -d -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development --name hnproxyapi-instance hnproxyapi
    ```
-4. **Verify:** Access the API via `http://localhost:8080/swagger`.
+4. **Verify:** Access the API via:
+   `http://localhost:8080/swagger` or
+   `http://localhost:8080/api/BestStories?n=[number_here]`
 
 ### Option C: Using Visual Studio 2022
 1. Open `HNProxyAPI.sln`.
