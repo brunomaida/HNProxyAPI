@@ -1,8 +1,11 @@
-﻿using HNProxyAPI.Services;
+using HNProxyAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HackerNewsQueryAPI.Controllers
 {
+    /// <summary>
+    /// Main controller for functions related to Hacker news best stories.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class BestStoriesController : ControllerBase
@@ -17,6 +20,12 @@ namespace HackerNewsQueryAPI.Controllers
             _hackerNewsService = hackerNewsService;
         }
 
+        /// <summary>
+        /// Retrieves the N first stories in descending order by score.
+        /// </summary>
+        /// <param name="n">First N records.</param>
+        /// <param name="ct">The Cancellation token used in the entire request.</param>
+        /// <returns></returns>
         [HttpGet(Name = "GetBestStories")]
         public async Task<IActionResult> Get([FromQuery] int n, CancellationToken ct)
         {

@@ -36,8 +36,6 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void EstimateMemorySizeOf_Should_Calculate_EmptyStrings_Correctly()
         {
-            // Arrange
-            // Empty strings are not null; they incur the cost of the reference + overhead
             var story = new Story
             {
                 id = 1,
@@ -45,8 +43,6 @@ namespace HNProxyAPI.Tests.Unit
                 uri = "",
                 postedBy = ""
             };
-
-            // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
             // #ASSERT
@@ -59,7 +55,6 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void EstimateMemorySizeOf_Should_Calculate_PopulatedStrings_Correctly()
         {
-            // Arrange
             var story = new Story
             {
                 id = 1,
@@ -67,8 +62,6 @@ namespace HNProxyAPI.Tests.Unit
                 uri = "12",           // 2 chars
                 postedBy = "1"        // 1 char
             };
-
-            // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
             // #ASSERT
@@ -85,7 +78,6 @@ namespace HNProxyAPI.Tests.Unit
         [Fact]
         public void EstimateMemorySizeOf_Should_Handle_Mixed_Null_And_Populated_Strings()
         {
-            // Arrange
             var story = new Story
             {
                 id = 99,
@@ -93,8 +85,6 @@ namespace HNProxyAPI.Tests.Unit
                 uri = null,    // Null (Cost 0 in this specific implementation)
                 postedBy = null // Null (Cost 0)
             };
-
-            // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
             // #ASSERT
@@ -102,7 +92,6 @@ namespace HNProxyAPI.Tests.Unit
             // Title: 34 + (1 * 2) = 36 bytes
             // Uri: 0
             // By: 0
-
             // Total: 36 + 36 = 72 bytes
             size.Should().Be(72);
         }
@@ -114,15 +103,12 @@ namespace HNProxyAPI.Tests.Unit
         [InlineData("ab", 74)] // Base(36) + StrBase(34) + 4 = 74
         public void EstimateMemorySizeOf_Should_Scale_Linearly_With_TitleLength(string title, long expectedSize)
         {
-            // Arrange
             var story = new Story
             {
                 title = title,
                 uri = null,
                 postedBy = null
             };
-
-            // Act
             long size = StoryMetrics.EstimateMemorySizeOf(in story);
 
             // #ASSERT

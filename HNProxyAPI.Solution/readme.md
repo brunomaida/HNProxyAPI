@@ -28,7 +28,7 @@ You can execute the application using the .NET CLI, Docker, or Visual Studio. Be
     ```
 
 ### Option A: Using .NET CLI (Recommended for Devs)
-1.  Navigate to the API project directory:
+1.  Navigate to the **API project** directory:
     ```bash
     cd HNProxyAPI
 

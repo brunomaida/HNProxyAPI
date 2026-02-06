@@ -138,14 +138,9 @@ namespace HNProxyAPI.Tests.Unit
                 Times.Once);
         }
 
-        #region GetStoryDetailsAsync Tests
-
         [Fact]
         public async Task GetStoryDetailsAsync_Should_Return_Story_On_Success()
         {
-            // Arrange
-            // Nota: O seu código usa um StoryConverter. O JSON aqui deve ser compatível com o que o Converter espera.
-            // Assumindo um JSON padrão do HackerNews:
             var jsonResponse = """
             {
                 "id": 12345,
@@ -162,8 +157,6 @@ namespace HNProxyAPI.Tests.Unit
                 Content = new StringContent(jsonResponse)
             };
             var sut = CreateSut(response);
-
-            // Act
             var result = await sut.GetStoryDetailsAsync(12345, CancellationToken.None);
 
             // #ASSERT

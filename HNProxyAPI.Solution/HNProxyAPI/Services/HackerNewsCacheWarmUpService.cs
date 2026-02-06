@@ -1,5 +1,8 @@
-﻿namespace HNProxyAPI.Services
+namespace HNProxyAPI.Services
 {
+    /// <summary>
+    /// Background service to load data into memory after API initialization
+    /// </summary>
     public class HackerNewsCacheWarmUpService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;

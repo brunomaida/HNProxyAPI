@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Data;
+using HNProxyAPI.Data;
 using HNProxyAPI.Metrics;
 using HNProxyAPI.Middlewares;
 using HNProxyAPI.Services;
@@ -11,11 +11,15 @@ using System.Threading.RateLimiting;
 namespace HNProxyAPI.Extensions
 {
     /// <summary>
-    /// 
+    /// Organizes the setup of services outside program.cs
     /// </summary>
     public static class ServiceCollectionExtensions
     {
-        // Groups all file configurations required to calibrate the system execution
+        /// <summary>
+        /// Groups all file configurations required to calibrate the system execution
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddAppConfiguration(this IServiceCollection services)
         {
             services.AddOptions<InboundAPISettings>()
@@ -31,7 +35,11 @@ namespace HNProxyAPI.Extensions
             return services;
         }
 
-        // Groups the main structure: HackerNews, Metrics, Http
+        /// <summary>
+        /// Groups the main structure: HackerNews, Metrics, Http
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddHackerNewsInfrastructure(this IServiceCollection services)
         {
             services.AddMetrics();
@@ -81,7 +89,6 @@ namespace HNProxyAPI.Extensions
                     opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                 });
             });
-
             return services;
         }
     }

@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Data;
+using HNProxyAPI.Data;
 using HNProxyAPI.Extensions;
 using HNProxyAPI.Settings;
 using Microsoft.Extensions.Options;
@@ -7,6 +7,9 @@ using System.Diagnostics.Metrics;
 
 namespace HNProxyAPI.Services
 {
+    /// <summary>
+    /// The orchestrator responsible to query HackerNews info, store data in memory e delivery the final result.    
+    /// </summary>
     public class HackerNewsQueryService
     {
         private const string METER_NAME = "Network.HackerNewsQueryService";
@@ -39,15 +42,19 @@ namespace HNProxyAPI.Services
         }
 
         /// <summary>
-        /// virtual attribute used for test purposes (mock needs it to be able to intercept this method)
+        /// 
+        /// Info: Virtual attribute used for test purposes (mock needs it to be able to intercept this method)
         /// </summary>
-        /// <param name="ct"></param>
-        /// <returns></returns>
+        /// <param name="ct">The Cancellation token used in the entire process.</param>
+        /// <returns>The desceding ordered list of Stories according to their score.</returns>
         public virtual async Task<IEnumerable<Story>> GetBestStoriesOrderedByScoreAsync(CancellationToken ct)
         {
             
-            bool isLocked = false; 
+            bool isLocked = false;
 
+            // #MT: Conditional locking strategy
+            // If the cache is empty, block indefinitely to ensure data initialization.
+            // If data exists, attempt a non-blocking lock (try-acquire) to skip redundant updates if another thread is already working.
             if (_storyCache.IsEmpty)
             {
                 await _semGate.WaitAsync(ct);
@@ -73,12 +80,9 @@ namespace HNProxyAPI.Services
                         return currentList;
 
                     var cachedIds = currentList.Select(s => s.id).ToHashSet();
-
-                    // =============================================================================
-                    // Query, process, store and organize new IDs
-                    // =============================================================================
                     var (idsToAdd, idsToDel) = StoryDifferences.GetDelta(currentIds, cachedIds);
                     _storyCache.RemoveOldIds(idsToDel);
+
                     if (idsToAdd.Count == 0)
                     {
                         _logger.LogInformation("No new IDs retrieved. Will use the ones in memory (already ordered)");
@@ -113,7 +117,6 @@ namespace HNProxyAPI.Services
                     _queryTimeHistorgram.Record(elapsed);
                     _logger.LogDebug("-> Timespan to query NEW Story details in Hacker News: {TimeInMs}ms", elapsed);
 
-                    // rebuilds the cache list of stores after new Ids
                     await _storyCache.RebuildOrderedListAsync();
 
                     return _storyCache.GetOrderedList();

@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Data;
+using HNProxyAPI.Data;
 using HNProxyAPI.Extensions;
 using HNProxyAPI.Settings;
 using Microsoft.Extensions.Options;

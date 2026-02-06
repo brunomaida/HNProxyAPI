@@ -7,22 +7,20 @@ using System.Diagnostics.Metrics;
 namespace HNProxyAPI.Data
 {
     /// <summary>
-    /// 
+    /// Controls the current Stories in/out the hot/path, always ordered
     /// </summary>
     public class StoryCache : IStoryCache, IDisposable
     {
-        // Dependencies
         private readonly ILogger<IStoryCache> _logger;
         private readonly IOptionsMonitor<HackerNewsServiceSettings> _settings;
 
-        // Data Structures
         // Local O(1) dictionary to ensure uniqueness
         private readonly ConcurrentDictionary<int, Story> _storyCache = new();    
         
-        // Ordered list to be used as final resust
+        // #MT: Allows multiple coordinated read-write among threads
         private volatile IReadOnlyList<Story> _orderedList = ImmutableList<Story>.Empty; 
 
-        // Concurrency Control
+        // Concurrency Control (one at a time)
         private readonly SemaphoreSlim _semCacheLock = new(1, 1);
 
         // State Control (Atomic)
@@ -39,11 +37,11 @@ namespace HNProxyAPI.Data
         private static readonly Comparison<Story> ScoreComparison = (a, b) => b.score.CompareTo(a.score);
 
         /// <summary>
-        /// 
+        /// Creates an instance to control Stories (add, remove and reorder).
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="settings"></param>
-        /// <param name="meterFactory"></param>
+        /// <param name="logger">Injected logger</param>
+        /// <param name="settings">Injected settings</param>
+        /// <param name="meterFactory">Injected meter factory for statistics</param>
         public StoryCache(
             ILogger<IStoryCache> logger,
             IOptionsMonitor<HackerNewsServiceSettings> settings,
@@ -72,28 +70,28 @@ namespace HNProxyAPI.Data
         }
 
         /// <summary>
-        /// 
+        /// State of the cache
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns if cache (memory) is empty (has no data)</returns>
         public bool IsEmpty
         {
             get { return _storyCache.IsEmpty; }
         }
 
         /// <summary>
-        /// 
+        /// Checks if corresponding ID is in cache
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Story ID</param>
+        /// <returns>If the cache contains the ID</returns>
         public bool Contains(int id)
         {
             return _storyCache.ContainsKey(id);
         }
 
         /// <summary>
-        /// 
+        /// Retrieves the ordered list of Stories in cache
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Descending ordered list of Stories</returns>
         public IReadOnlyList<Story> GetOrderedList()
         {
             // Returns the reference to the current snapshot (Zero CPU, Zero Lock)
@@ -101,10 +99,10 @@ namespace HNProxyAPI.Data
         }
 
         /// <summary>
-        /// 
+        /// Tries to add a new Story into the cache
         /// </summary>
-        /// <param name="story"></param>
-        /// <returns></returns>
+        /// <param name="story">Current story to add</param>
+        /// <returns>If the operation succeeds</returns>
         public bool TryAdd(Story story)
         {
             // Memory Limit Check (Heuristic)
@@ -134,6 +132,10 @@ namespace HNProxyAPI.Data
             return true; // Already existed, considered success
         }
 
+        /// <summary>
+        /// Removes the listed IDs from the cache
+        /// </summary>
+        /// <param name="oldIds">List of Story IDs</param>
         public void RemoveOldIds(IEnumerable<int> oldIds)
         {
             if (!oldIds.Any()) return;
@@ -157,9 +159,9 @@ namespace HNProxyAPI.Data
         }
 
         /// <summary>
-        /// 
+        /// Asynchronosly rebuilds the list in desceding order
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The process to execute the reorder mechanism</returns>
         public async Task RebuildOrderedListAsync()
         {
             // Locks to ensure only 1 task reorders at a time
@@ -192,9 +194,9 @@ namespace HNProxyAPI.Data
         }
 
         /// <summary>
-        /// Recalculates the average object size using logarithmic sampling to avoid 
-        /// stalling the CPU by iterating over millions of items.
+        /// Recalculates the average object size using Sqrt sampling 
         /// </summary>
+        /// <param name="stories">The array-list of Stories</param>
         private void RecalculateAverageSize(Story[] stories)
         {
             int totalCount = stories.Length;
@@ -224,6 +226,9 @@ namespace HNProxyAPI.Data
             _logger.LogDebug("[memory] Metrics updated. Avg Size: {Old} -> {New} bytes.", oldAverage, newAverage);
         }
 
+        /// <summary>
+        /// Disposes the object releasing its internal resources
+        /// </summary>
         public void Dispose()
         {
             _meter?.Dispose();

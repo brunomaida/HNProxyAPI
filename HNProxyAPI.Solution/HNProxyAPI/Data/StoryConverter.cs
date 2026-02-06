@@ -1,10 +1,20 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace HNProxyAPI.Data
 {
+    /// <summary>
+    /// Implements serialization/deserialization of a json-format Story
+    /// </summary>
     public class StoryConverter : JsonConverter<Story>
     {
+        /// <summary>
+        /// Transforms a json block into a Story object
+        /// </summary>
+        /// <param name="reader">The UTF-8 json reader</param>
+        /// <param name="typeToConvert">The type to convert (Story)</param>
+        /// <param name="options">Json serialization Options</param>
+        /// <returns>A new Story</returns>
         public override Story Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             int id = 0;
@@ -63,6 +73,12 @@ namespace HNProxyAPI.Data
             return new Story(id, title, uri, postedBy, time, score);
         }
 
+        /// <summary>
+        /// Transforms Story object in a json-format string block
+        /// </summary>
+        /// <param name="writer">The UTF-8 json writer</param>
+        /// <param name="value">The Story to serialize</param>
+        /// <param name="options">Json serialization Options</param>
         public override void Write(Utf8JsonWriter writer, Story value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();

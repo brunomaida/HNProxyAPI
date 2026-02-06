@@ -1,4 +1,4 @@
-﻿using HNProxyAPI.Data;
+using HNProxyAPI.Data;
 using HNProxyAPI.Settings;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
@@ -7,6 +7,9 @@ using System.Text.Json;
 
 namespace HNProxyAPI.Services
 {
+    /// <summary>
+    /// The engine responsible to query Hacker news data from configured URLs
+    /// </summary>
     public class HackerNewsClient : IHackerNewsClient
     {
         private const string METER_NAME = "Network.HackerNewsClient";
@@ -43,6 +46,11 @@ namespace HNProxyAPI.Services
                 );
         }        
 
+        /// <summary>
+        /// Retrieves current Stories
+        /// </summary>
+        /// <param name="ct">Cancellation token used in the entire process</param>
+        /// <returns></returns>
         public async Task<int[]> GetCurrentStoriesAsync(CancellationToken ct)
         {
             // Base URL for the external web API
@@ -83,6 +91,12 @@ namespace HNProxyAPI.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves Story details
+        /// </summary>
+        /// <param name="id">ID of the Story</param>
+        /// <param name="ct">Cancellation token used in the entire process</param>
+        /// <returns></returns>
         public async Task<Story> GetStoryDetailsAsync(int id, CancellationToken ct)
         {
             /* Sample Story Details (JSON):

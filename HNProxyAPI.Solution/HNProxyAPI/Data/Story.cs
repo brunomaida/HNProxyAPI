@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -16,14 +16,14 @@ namespace HNProxyAPI.Data
     },*/
 
     /// <summary>
-    /// 
+    /// Represents a Story
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="title"></param>
-    /// <param name="uri"></param>
-    /// <param name="postedBy"></param>
-    /// <param name="time"></param>
-    /// <param name="score"></param>
+    /// <param name="id">Unique Story ID</param>
+    /// <param name="title">The title of the Story</param>
+    /// <param name="uri">The URL of the Story content</param>
+    /// <param name="postedBy">Who (user) posted the Story</param>
+    /// <param name="time">The time the Story was posted</param>
+    /// <param name="score">The current Story's score among others</param>
     [JsonConverter(typeof(StoryConverter))]
     public readonly record struct Story(
         int id,

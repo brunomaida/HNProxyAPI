@@ -62,4 +62,4 @@ app.MapControllers().RequireRateLimiting("GlobalPolicy");
 
 app.Run();
 
-public partial class Program { }
+public partial class Program { } // This is needed for testing purposes: class needs to be visible 

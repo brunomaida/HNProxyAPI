@@ -1,8 +1,11 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
 namespace HNProxyAPI.Metrics
 {
+    /// <summary>
+    /// System metrics with observable values of heap, stack and threads for the process
+    /// </summary>
     public class SystemMetricsCollector
     {
         private readonly Meter _meter;
@@ -57,6 +60,9 @@ namespace HNProxyAPI.Metrics
                 description: "Estimated total stack size for all threads in the process.");
         }
 
+        /// <summary>
+        /// Releases the objects and its dependencies in the memory
+        /// </summary>
         public void Dispose()
         {
             _meter?.Dispose();
